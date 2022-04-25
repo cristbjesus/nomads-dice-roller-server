@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import express from 'express';
 
 import bodyParser from 'body-parser';
@@ -69,7 +71,7 @@ import { StreamChat } from 'stream-chat';
 
   // Start the Server
   app.listen(port, () => {
-    console.log(`server running ${config.url}`);
+    console.log(`Server running on PORT ${port}`);
     console.log('press CTRL+C to stop server');
   });
 })();
