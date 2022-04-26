@@ -1,11 +1,12 @@
 require('dotenv').config();
 
 import express from 'express';
-
+import cors from 'cors';
 import bodyParser from 'body-parser';
-import { config } from './config/config';
 
 import { StreamChat } from 'stream-chat';
+
+import { config } from './config/config';
 
 (async () => {
 
@@ -17,20 +18,18 @@ import { StreamChat } from 'stream-chat';
     config.stream_app_secret
   );
 
-  // CORS Should be restricted
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', `http://${config.aws_website_bucket}.s3-website-${config.aws_region}.amazonaws.com`);
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-Access-Token, Authorization');
-    res.header('Access-Control-Allow-Methods', '*');
-    next();
-  });
-
+  // CORS
+  app.use(cors({
+    allowedHeaders: [ 'Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Access-Token', 'Authorization' ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: `http://${config.aws_website_bucket}.s3-website-${config.aws_region}.amazonaws.com`
+  }));
 
   app.use(bodyParser.json());
 
   // Root URI call
-  app.get('/', (req, res) => {
-    res.json(null);
+  app.get('/', (_req, res) => {
+    res.json();
   });
 
   // Join a channel
@@ -48,7 +47,7 @@ import { StreamChat } from 'stream-chat';
 
     try {
       await channel.create();
-      await channel.addMembers([characterId]);
+      await channel.addMembers([ characterId ]);
     } catch (err) {
       console.log(err);
     }
@@ -66,7 +65,7 @@ import { StreamChat } from 'stream-chat';
       console.log(err);
     }
 
-    return res.json(null);
+    return res.json();
   });
 
   // Start the Server
